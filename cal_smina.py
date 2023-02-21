@@ -42,6 +42,34 @@ def smina_score(ligand):
     # 删除分数文件
     os.remove(log_file)
 
+smina_header = ['gauss(o=0,_w=0.3,_c=8)', 'gauss(o=0.5,_w=0.3,_c=8)', 'gauss(o=1,_w=0.3,_c=8)',
+             'gauss(o=1.5,_w=0.3,_c=8)', 'gauss(o=2,_w=0.3,_c=8)', 'gauss(o=2.5,_w=0.3,_c=8)', 'gauss(o=0,_w=0.5,_c=8)'
+                , 'gauss(o=1,_w=0.5,_c=8)', 'gauss(o=2,_w=0.5,_c=8)', 'gauss(o=0,_w=0.7,_c=8)',
+             'gauss(o=1,_w=0.7,_c=8)',
+             'gauss(o=2,_w=0.7,_c=8)', 'gauss(o=0,_w=0.9,_c=8)', 'gauss(o=1,_w=0.9,_c=8)', 'gauss(o=2,_w=0.9,_c=8)',
+             'gauss(o=3,_w=0.9,_c=8)', 'gauss(o=0,_w=1.5,_c=8)', 'gauss(o=1,_w=1.5,_c=8)', 'gauss(o=2,_w=1.5,_c=8)',
+             'gauss(o=3,_w=1.5,_c=8)', 'gauss(o=4,_w=1.5,_c=8)', 'gauss(o=0,_w=2,_c=8)', 'gauss(o=1,_w=2,_c=8)',
+             'gauss(o=2,_w=2,_c=8)', 'gauss(o=3,_w=2,_c=8)', 'gauss(o=4,_w=2,_c=8)', 'gauss(o=0,_w=3,_c=8)',
+             'gauss(o=1,_w=3,_c=8)', 'gauss(o=2,_w=3,_c=8)', 'gauss(o=3,_w=3,_c=8)', 'gauss(o=4,_w=3,_c=8)',
+             'repulsion(o=0.4,_c=8)', 'repulsion(o=0.2,_c=8)', 'repulsion(o=0,_c=8)', 'repulsion(o=-0.2,_c=8)',
+             'repulsion(o=-0.4,_c=8)', 'repulsion(o=-0.6,_c=8)', 'repulsion(o=-0.8,_c=8)', 'repulsion(o=-1,_c=8)',
+             'hydrophobic(g=0.5,_b=1.5,_c=8)', 'hydrophobic(g=0.5,_b=1,_c=8)', 'hydrophobic(g=0.5,_b=2,_c=8)',
+             'hydrophobic(g=0.5,_b=3,_c=8)', 'non_hydrophobic(g=0.5,_b=1.5,_c=8)', 'vdw(i=4,_j=8,_s=0,_^=100,_c=8)',
+             'vdw(i=6,_j=12,_s=1,_^=100,_c=8)', 'non_dir_h_bond(g=-0.7,_b=0,_c=8)', 'non_dir_h_bond(g=-0.7,_b=0.2,_c=8)'
+                , 'non_dir_h_bond(g=-0.7,_b=0.5,_c=8)', 'non_dir_h_bond(g=-1,_b=0,_c=8)',
+             'non_dir_h_bond(g=-1,_b=0.2,_c=8)',
+             'non_dir_h_bond(g=-1,_b=0.5,_c=8)', 'non_dir_h_bond(g=-1.3,_b=0,_c=8)',
+             'non_dir_h_bond(g=-1.3,_b=0.2,_c=8)',
+             'non_dir_h_bond(g=-1.3,_b=0.5,_c=8)', 'non_dir_anti_h_bond_quadratic(o=0,_c=8)',
+             'non_dir_anti_h_bond_quadratic(o=0.5,_c=8)', 'non_dir_anti_h_bond_quadratic(o=1,_c=8)',
+             'donor_donor_quadratic(o=0,_c=8)', 'donor_donor_quadratic(o=0.5,_c=8)', 'donor_donor_quadratic(o=1,_c=8)',
+             'acceptor_acceptor_quadratic(o=0,_c=8)', 'acceptor_acceptor_quadratic(o=0.5,_c=8)',
+             'acceptor_acceptor_quadratic(o=1,_c=8)', 'non_dir_h_bond_lj(o=-0.7,_^=100,_c=8)',
+             'non_dir_h_bond_lj(o=-1,_^=100,_c=8)', 'non_dir_h_bond_lj(o=-1.3,_^=100,_c=8)',
+             'ad4_solvation(d-sigma=3.6,_s/q=0.01097,_c=8)', 'ad4_solvation(d-sigma=3.6,_s/q=0,_c=8)',
+             'electrostatic(i=1,_^=100,_c=8)', 'electrostatic(i=2,_^=100,_c=8)', 'num_tors_div', 'num_tors_div_simple',
+             'num_heavy_atoms_div', 'num_heavy_atoms', 'num_tors_add', 'num_tors_sqr', 'num_tors_sqrt',
+             'num_hydrophobic_atoms', 'ligand_length', 'num_ligands']
 
 def cal_smina():
     global path

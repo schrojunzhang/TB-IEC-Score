@@ -20,22 +20,22 @@ def main():
         data = dataset(name)  # instance
         for term in ['vdw', 'hb', 'elec', 'lipo', 'entropy', 'clash']:  # for different energy terms
             # csv_file
-            csv = '/home/xujun/Project_2/5_importance/vina_{}.csv'.format(term)
+            dst_csv = '/home/xujun/Project_2/5_importance/vina_{}.csv'.format(term)
             # cal importance
             importance = data.cal_importance(energy_type=term)  # 计算第一次
             # define columns
             columns = [sf for sf in importance]
             columns_name = ['name'] + columns + ['best']  # rename
             # create csv file
-            if not os.path.exists(csv):
-                pd.DataFrame(columns_name).T.to_csv(csv, index=False, header=False, mode='w')  # 创建CSV
+            if not os.path.exists(dst_csv):
+                pd.DataFrame(columns_name).T.to_csv(dst_csv, index=False, header=False, mode='w')  # 创建CSV
             for i in range(99):  # repeat 100 times
                 new_importance = data.cal_importance(energy_type=term)
                 importance = dict(zip(columns, [importance[sf] + new_importance[sf] for sf in columns]))
             avg_importance = [importance[sf] for sf in columns]
             best = [max(importance,
                         key=lambda k: importance[k])]  # get the scoring function achieving the best importance score
-            pd.DataFrame([name] + [x / 100 for x in avg_importance] + best).T.to_csv(csv, index=False, header=False,
+            pd.DataFrame([name] + [x / 100 for x in avg_importance] + best).T.to_csv(dst_csv, index=False, header=False,
                                                                                      mode='a')  # output to csv
 
 

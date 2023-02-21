@@ -60,7 +60,6 @@ def cal_aff():
     path = r'/home/xujun/Project_2/2_descriptor'
     names = ['akt1', 'ampc', 'cp3a4', 'cxcr4', 'gcr', 'hivpr', 'hivrt', 'kif11',
              'KAT2A', 'MAPK1', 'MTORC1', 'VDR', 'PKM2', 'TP53', 'ALDH1', 'ESR1_ant', 'GBA', 'FEN1']
-    names = ['akt1', 'ampc', 'cp3a4', 'cxcr4', 'gcr', 'hivpr', 'hivrt', 'kif11']
     for name in names:
         global path_name, path_name_lig, pre_protein_file, csv_file
         path_name = '%s/%s' % (path, name)

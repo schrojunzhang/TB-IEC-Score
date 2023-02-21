@@ -187,12 +187,12 @@ def rf_model(df, *, over_sampling=False, hyper_opt=True):
     return [ef_1, ef_2, ef_5, cross_score, tn, fp, fn, tp, acc, f1, mcc, kappa, roc_auc, pred_pro]
 
 
-def xgb_model(df, *, over_sampling=False, hyper_opt=True):
+def xgb_model(df, *,train_size=0.8, over_sampling=False, hyper_opt=True, return_model=False):
     #  get x and y
     x = df.iloc[:, 1:-1]
     y = df.iloc[:, -1]
     # split dataset
-    train_x, test_x, train_y, test_y = train_test_split(x, y, train_size=0.8, random_state=42, stratify=y,
+    train_x, test_x, train_y, test_y = train_test_split(x, y, train_size=train_size, random_state=42, stratify=y,
                                                         shuffle=True)
     # over sampling
     if over_sampling:
@@ -241,24 +241,27 @@ def xgb_model(df, *, over_sampling=False, hyper_opt=True):
         # classifier instance with default hyper-parameters
         clf = XGBClassifier(n_jobs=10, random_state=42)
     clf.fit(train_x, train_y)  # training
-    # test
-    pred = clf.predict(test_x)
-    pred_pro = clf.predict_proba(test_x)
-    pred_pro = [i[1] for i in pred_pro]
-    # cal enrichment factor
-    ef_1 = cal_ef(test_y, pred_pro, top=0.01)
-    ef_2 = cal_ef(test_y, pred_pro, top=0.02)
-    ef_5 = cal_ef(test_y, pred_pro, top=0.05)
-    # metrics
-    cross_score = cross_val_score(clf, train_x, train_y, cv=StratifiedKFold(n_splits=10, shuffle=True, random_state=42),
-                                  scoring='f1', n_jobs=10).mean()
-    tn, fp, fn, tp = confusion_matrix(test_y, pred).ravel()
-    roc_auc = roc_auc_score(y_true=test_y, y_score=pred_pro)
-    acc = accuracy_score(test_y, pred)
-    f1 = f1_score(test_y, pred)
-    mcc = matthews_corrcoef(test_y, pred)
-    kappa = cohen_kappa_score(test_y, pred)
-    return [ef_1, ef_2, ef_5, cross_score, tn, fp, fn, tp, acc, f1, mcc, kappa, roc_auc, pred_pro]
+    if return_model:
+        return clf
+    else:
+        # test
+        pred = clf.predict(test_x)
+        pred_pro = clf.predict_proba(test_x)
+        pred_pro = [i[1] for i in pred_pro]
+        # cal enrichment factor
+        ef_1 = cal_ef(test_y, pred_pro, top=0.01)
+        ef_2 = cal_ef(test_y, pred_pro, top=0.02)
+        ef_5 = cal_ef(test_y, pred_pro, top=0.05)
+        # metrics
+        cross_score = cross_val_score(clf, train_x, train_y, cv=StratifiedKFold(n_splits=10, shuffle=True, random_state=42),
+                                    scoring='f1', n_jobs=10).mean()
+        tn, fp, fn, tp = confusion_matrix(test_y, pred).ravel()
+        roc_auc = roc_auc_score(y_true=test_y, y_score=pred_pro)
+        acc = accuracy_score(test_y, pred)
+        f1 = f1_score(test_y, pred)
+        mcc = matthews_corrcoef(test_y, pred)
+        kappa = cohen_kappa_score(test_y, pred)
+        return [ef_1, ef_2, ef_5, cross_score, tn, fp, fn, tp, acc, f1, mcc, kappa, roc_auc, pred_pro]
 
 
 def main(name):

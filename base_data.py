@@ -19,10 +19,9 @@ from sklearn.preprocessing import StandardScaler
 class dataset(object):
     def __init__(self, name):
         self.target = name
-        self.__path = os.path.dirname(os.path.realpath(__file__))
-        self.__project_path = os.path.dirname(self.__path)
+        self.__project_path = os.path.dirname(os.path.realpath(__file__))
         self.__file_path = f'{self.__project_path}/source_data/3_combination'  # r'/home/xujun/Project_2/3_combination'
-        self.__vina_file_path = f'{self.__project_path}/source_data/3_combination'
+        self.__vina_file_path = self.__file_path
         self.__score_path = f'{self.__project_path}/source_data/4_score'  # r'/home/xujun/Project_2/4_score'
         self.__name_path = r'{}/{}'.format(self.__score_path, name)
         self.__csv = '{}/{}/{}.csv'.format(self.__file_path, self.target, self.target)
