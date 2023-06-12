@@ -1,5 +1,24 @@
 # TB-IEC-Score: An accurate and efficient machine learning-based scoring function for virtual screening
-## 1. To train a TB_IECS:
+## Install
+### Install smina:
+'''
+download smina: https://zenodo.org/record/8025922
+chmod +x smina
+'''
+### install nnscore 2.0
+'''
+download nnscore: https://zenodo.org/record/8025934
+unzip -q NNscore.zip
+'''
+### install mgltool
+'''
+down load mgltool: https://ccsb.scripps.edu/mgltools/download/491/
+tar -zxvf mgltools_x86_64Linux2_1.5.7p1.tar.gz
+cd mgltools_x86_64Linux2_1.5.7/
+chmod +x install.sh
+./install.sh
+'''
+## To train a TB_IECS:
 ```
 Usage:
 
@@ -7,13 +26,14 @@ python3 tb_iecs.py --protein_file [path/to/protein/file] --train_size [float num
 
 Arguments:
 --protein_file: The path of the protein PDB file.
---train_size: A float number used in the train-validation split.
---crystal_ligand_file: The path of the crystalized ligand file in MOL2 format.
+--train_size: A float number used in the train-validation split. Default is 0.8
+--crystal_ligand_file: The path of the crystalized ligand file in MOL2 format. Used for binding site locating.
 --tmp_dir: The temporary directory for file saving.
 --dst_dir: The directory for saving descriptors CSV file and model file.
 --ligand_path: The path for ligands files.
 ```
-## 2. scripts used for descriptors generation
+# other scripts related to experiments in the paper
+## 1. scripts used for descriptors generation
 ```
 Descriptions
 
@@ -40,7 +60,7 @@ Usage:
 3. python3 cal_xx.py
 ```
 
-## 3. Feature combination
+## 2. Feature combination
 ```
 Descriptions
 
@@ -61,7 +81,7 @@ cal_energy_importance.py:
 2. python cal_energy_importance.py
 
 ```
-## 4.Machine learning algorithms
+## 3. Machine learning algorithms
 ```
 Descriptions
 
