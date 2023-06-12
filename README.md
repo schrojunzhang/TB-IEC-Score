@@ -1,23 +1,23 @@
 # TB-IEC-Score: An accurate and efficient machine learning-based scoring function for virtual screening
 ## Install
 ### Install smina:
-'''
+```
 download smina: https://zenodo.org/record/8025922
 chmod +x smina
-'''
+```
 ### install nnscore 2.0
-'''
+```
 download nnscore: https://zenodo.org/record/8025934
 unzip -q NNscore.zip
-'''
+```
 ### install mgltool
-'''
+```
 down load mgltool: https://ccsb.scripps.edu/mgltools/download/491/
 tar -zxvf mgltools_x86_64Linux2_1.5.7p1.tar.gz
 cd mgltools_x86_64Linux2_1.5.7/
 chmod +x install.sh
 ./install.sh
-'''
+```
 ## To train a TB_IECS:
 ```
 Usage:
