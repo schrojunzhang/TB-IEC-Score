@@ -262,6 +262,62 @@ def xgb_model(df, *,train_size=0.8, over_sampling=False, hyper_opt=True, return_
         mcc = matthews_corrcoef(test_y, pred)
         kappa = cohen_kappa_score(test_y, pred)
         return [ef_1, ef_2, ef_5, cross_score, tn, fp, fn, tp, acc, f1, mcc, kappa, roc_auc, pred_pro]
+    
+    
+def xgb_model_for_tbiecs(x, y=None, *, hyper_opt=True, 
+                         model=None,
+                         scaler=None,
+                         threshold=None,
+                         normalizer=None
+                         ):
+    # data preprocessing
+    if scaler is None:
+        scaler = StandardScaler().fit(x)  # mean = 0, variance = 1
+    train_x = scaler.transform(x)
+    if threshold is None:
+        threshold = VarianceThreshold().fit(train_x)
+    train_x = threshold.transform(train_x)
+    if normalizer is None:
+        normalizer = Normalizer(norm='l2').fit(train_x)  #
+    train_x = normalizer.transform(train_x)
+    # optimize hyper-parameters
+    if y is not None:
+        if hyper_opt:
+            def model(hyper_parameter):
+                clf = XGBClassifier(**hyper_parameter, n_jobs=10, random_state=42)
+                e = cross_val_score(clf, train_x, y, cv=StratifiedKFold(n_splits=10, shuffle=True, random_state=42),
+                                    scoring='f1', n_jobs=10).mean()
+                return -e
+
+            hyper_parameter = {'n_estimators': hp.choice('n_estimators', range(100, 301, 10)),
+                            'max_depth': hp.choice('max_depth', range(3, 11)),
+                            'learning_rate': hp.uniform('learning_rate', 0.1, 0.5),
+                            'reg_lambda': hp.uniform('reg_lambda', 0.5, 3)}  # hyper-parameters
+            # hyper-parameter list
+            estimators = [i for i in range(100, 301, 10)]
+            depth = [i for i in range(3, 11)]
+            # optimization
+            best = fmin(model, hyper_parameter, algo=tpe.suggest, max_evals=100,
+                        rstate=np.random.RandomState(42))
+            # classifier instance with best hyper-parameters
+            clf = XGBClassifier(n_estimators=estimators[best['n_estimators']],
+                                max_depth=depth[best['max_depth']],
+                                learning_rate=best['learning_rate'],
+                                reg_lambda=best['reg_lambda'],
+                                n_jobs=10, random_state=42)
+        else:  # no optimization
+            # classifier instance with default hyper-parameters
+            clf = XGBClassifier(n_jobs=10, random_state=42)
+        # training
+        clf.fit(train_x, y)  # training
+        return [scaler, threshold, normalizer, clf]
+    else:
+        clf = model
+        # test
+        pred = clf.predict(train_x)
+        pred_pro = clf.predict_proba(train_x)
+        pred_pro = [i[1] for i in pred_pro]
+        return pred, pred_pro
 
 
 def main(name):

@@ -1,36 +1,61 @@
 # TB-IEC-Score: An accurate and efficient machine learning-based scoring function for virtual screening
-## Install
+## Installation
 ### Install smina:
 ```
-download smina: https://zenodo.org/record/8025922
-chmod +x smina
+download smina: https://zenodo.org/record/8025952
+mkdir /root/smina
+mv smina /root/smina/smina
+mv total.score /root/smina/total.score
+cd /root/smina
+chmod +x ./smina
+# smina_path = '/root/smina'
 ```
 ### install nnscore 2.0
 ```
 download nnscore: https://zenodo.org/record/8025934
 unzip -q NNscore.zip
+mv NNscore /root/NNscore
+# nnscore_path = '/root/NNscore'
 ```
 ### install mgltool
 ```
-down load mgltool: https://ccsb.scripps.edu/mgltools/download/491/
+download mgltool: https://ccsb.scripps.edu/mgltools/download/491/
 tar -zxvf mgltools_x86_64Linux2_1.5.7p1.tar.gz
 cd mgltools_x86_64Linux2_1.5.7/
 chmod +x install.sh
 ./install.sh
+# mgltool_path = '/opt/mgltools/1.5.7'
 ```
-## To train a TB_IECS:
+## To train/use a TB_IECS:
 ```
 Usage:
-
-python3 tb_iecs.py --protein_file [path/to/protein/file] --train_size [float number] --crystal_ligand_file [path/to/crystalized/ligand/file] --tmp_dir [temporary/directory/path] --dst_dir [directory/path/for/saving/files] --ligand_path [path/to/ligands/files]
+# set the environment variables
+export SMINA=/root/smina
+export NNSCORE=/root/NNscore
+export MGLTOOL=/opt/mgltools/1.5.7
+# run the script
+python3 tb_iecs.py --protein_file [path/to/protein/file] --label_csv [path/to/label_csv/file] --mode ['train', 'test'] --crystal_ligand_file [path/to/crystalized/ligand/file] --dst_dir [~/path/for/result_file_save] --model_file [~/path/for/model_pkl_save] --ligand_path [path/to/ligands/files]
 
 Arguments:
 --protein_file: The path of the protein PDB file.
---train_size: A float number used in the train-validation split. Default is 0.8
+--label_csv: The path of the csv file recoding the ligand's class [1:active or 0:inactive]. The csv file should contain two columns: 'name' and 'label'. 'name' represents the ligand's name, and 'label' represents the ligand's bio-activity.
+--mode: choice from ['train', 'test']. If 'train', the model will be trained and saved. If 'test', the model will be loaded and used for prediction.
 --crystal_ligand_file: The path of the crystalized ligand file in MOL2 format. Used for binding site locating.
---tmp_dir: The temporary directory for file saving.
---dst_dir: The directory for saving descriptors CSV file and model file.
---ligand_path: The path for ligands files.
+--dst_dir: The directory for result file saving.
+--model_file: The directory for saving/loading model file.
+--ligand_path: The path for ligands files. multiple ligands files in SDF format are supported.
+
+Training Example:
+
+python3 tb_iecs.py --protein_file xx/1a30.pdb --label_csv xx/train_lig.csv --mode train --crystal_ligand_file xx/1a30.mol2 --dst_dir xx/result --model_file xx/tb_iec.pkl --ligand_path xx/ligands
+
+Result: xx/tb_iec.pkl, a model pkl that can be used for prediction
+
+Evaluation Example:
+
+python3 tb_iecs.py --protein_file xx/1a30.pdb --label_csv xx/test_lig.csv --mode test --crystal_ligand_file xx/1a30.mol2 --dst_dir xx/result --model_file xx/tb_iec.pkl --ligand_path xx/test_ligands
+
+Result: xx/result/result.csv, a csv file that records the predicted labels and predicted probabilities of each ligand
 ```
 # other scripts related to experiments in the paper
 ## 1. scripts used for descriptors generation

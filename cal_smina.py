@@ -4,7 +4,8 @@ import os
 import pandas as pd
 from multiprocessing import Pool
 # used for cal smina
-
+smina_path = os.environ.get('SMINA')  or '/root/smina'
+mgl_tool_path = os.environ.get('MGLTOOL') or '/opt/mgltools/1.5.7' 
 def smina_score(ligand):
     import time
     lig_name = ligand.split('.')[0]
@@ -13,19 +14,19 @@ def smina_score(ligand):
     # log
     log_file = '%s/%s_smina.txt' % (path_name, lig_name)
     if os.path.exists(ligand_pdbqt):
-        cmdline = '/home/xujun/Soft/SCORE_Function/smina/smina --receptor %s --ligand %s ' \
+        cmdline = '%s/smina --receptor %s --ligand %s ' \
                   '--center_x %s --center_y %s --center_z %s --size_x 18.75 --size_y 18.75 --size_z 18.75 --log %s ' \
-                  '--custom_scoring /home/xujun/Soft/SCORE_Function/smina/total.score ' \
-                  '--score_only --cpu 1' % (protein_pred, ligand_pdbqt, x, y, z, log_file)
+                  '--custom_scoring %s/total.score ' \
+                  '--score_only --cpu 1' % (smina_path, protein_pred, ligand_pdbqt, x, y, z, log_file, smina_path)
         os.system(cmdline)
     else:
-        cmdline = 'module purge &&'
-        cmdline += 'module load autodock &&'
-        cmdline += 'prepare_ligand4.py -l %s -o %s -A hydrogens &&' % (to_ligand, ligand_pdbqt)
-        cmdline = '/home/xujun/Soft/SCORE_Function/smina/smina --receptor %s --ligand %s ' \
+        # cmdline = 'module purge &&'
+        # cmdline += 'module load autodock &&'
+        cmdline = '%s/bin/pythonsh %s/MGLToolsPckgs/AutoDockTools/Utilities24/prepare_ligand4.py -l %s -o %s -A hydrogens &&' % (mgl_tool_path, mgl_tool_path, to_ligand, ligand_pdbqt)
+        cmdline += '/home/xujun/Soft/SCORE_Function/smina/smina --receptor %s --ligand %s ' \
                   '--center_x %s --center_y %s --center_z %s --size_x 18.75 --size_y 18.75 --size_z 18.75 --log %s ' \
-                  '--custom_scoring /home/xujun/Soft/SCORE_Function/smina/total.score ' \
-                  '--score_only --cpu 1' % (protein_pred, ligand_pdbqt, x, y, z, log_file)
+                  '--custom_scoring %s/total.score ' \
+                  '--score_only --cpu 1' % (protein_pred, ligand_pdbqt, x, y, z, log_file, smina_path)
         os.system(cmdline)
     # collect file
     while True:

@@ -2,7 +2,10 @@
 # -*- coding:utf-8 -*-
 # used for cal nnscore
 import os  # pandas as pd,
+nnscore_path = os.environ.get('NNSCORE') 
+mgl_tool_path = os.environ.get('MGLTOOL') or '/opt/mgltools/1.5.7' 
 import sys
+sys.path.append(nnscore_path)
 from multiprocessing import Pool
 from NNScore2module import PDB, binana, command_line_parameters
 
@@ -15,9 +18,9 @@ def nn_score(ligand):
     # prepare ligand
     log_file = '%s/%s_nn.txt' % (path_name, lig_name)  # 分数文件
     if not os.path.exists(ligand_pdbqt):
-        cmdline = 'module purge &&'
-        cmdline += 'module load vina &&'
-        cmdline += 'prepare_ligand4.py -l %s -o %s -A hydrogens ' % (to_ligand, ligand_pdbqt)
+        # cmdline = 'module purge &&'
+        # cmdline += 'module load vina &&'
+        cmdline = '%s/bin/pythonsh %s/MGLToolsPckgs/AutoDockTools/Utilities24/prepare_ligand4.py -l %s -o %s -A hydrogens ' % (mgl_tool_path, mgl_tool_path, to_ligand, ligand_pdbqt)
         os.system(cmdline)
 
     if not os.path.exists(ligand_pdbqt_pred):
@@ -33,7 +36,7 @@ def nn_score(ligand):
         with open(ligand_pdbqt_pred, 'w')as f:
             f.write(new_lig)
     # commandline
-    cmd = "/home/xujun/Soft/SCORE_Function/NNscore/NNScore2module.py -receptor %s -ligand %s" % (
+    cmd = "%s/NNScore2module.py -receptor %s -ligand %s" % (nnscore_path,
     protein_pred, ligand_pdbqt_pred)
     try:
         params_list = cmd.split()
@@ -53,8 +56,7 @@ def nn_score(ligand):
     with open(log_file, 'w')as f:
         f.write(str(result))
     # collect result
-    cmd = 'module load anaconda3/5.1.0 &&'
-    cmd += 'python /home/xujun/temp/nn_write.py %s %s' % (log_file, csv_file)
+    cmd = 'python3 ./nn_write.py %s %s' % (log_file, csv_file)
     os.system(cmd)
     # pd.DataFrame(result).T.to_csv(csv_file, index=None, header=None, mode='a')
     # remove file
