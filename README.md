@@ -37,11 +37,13 @@ pip3 install hyperopt
 ```
 ## To train/use a TB_IECS:
 ```
-Usage:
 # set the environment variables
 export SMINA=/root/smina
 export NNSCORE=/root/NNscore
 export MGLTOOL=/opt/mgltools/1.5.7
+```
+```
+Usage:
 # run the script
 python3 tb_iecs.py --protein_file [path/to/protein/file] --label_csv [path/to/label_csv/file] --mode ['train', 'test'] --crystal_ligand_file [path/to/crystalized/ligand/file] --dst_dir [~/path/for/result_file_save] --model_file [~/path/for/model_pkl_save] --ligand_path [path/to/ligands/files]
 
@@ -53,13 +55,15 @@ Arguments:
 --dst_dir: The directory for result file saving.
 --model_file: The directory for saving/loading model file.
 --ligand_path: The path for ligands files. multiple ligands files in SDF format are supported.
-
+```
+```
 Training Example:
 
 python3 tb_iecs.py --protein_file xx/1a30.pdb --label_csv xx/train_lig.csv --mode train --crystal_ligand_file xx/1a30.mol2 --dst_dir xx/result --model_file xx/tb_iec.pkl --ligand_path xx/training_ligands
 
 Result: xx/tb_iec.pkl, a model pkl that can be used for prediction
-
+```
+```
 Evaluation Example:
 
 python3 tb_iecs.py --protein_file xx/1a30.pdb --label_csv xx/test_lig.csv --mode test --crystal_ligand_file xx/1a30.mol2 --dst_dir xx/result --model_file xx/tb_iec.pkl --ligand_path xx/test_ligands
