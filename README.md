@@ -26,6 +26,15 @@ chmod +x install.sh
 ./install.sh
 # mgltool_path = '/opt/mgltools/1.5.7'
 ```
+### install python
+```
+sudo apt install python3
+sudo apt install python2
+pip3 install pandas
+pip3 install numpy
+pip3 install scikit-learn
+pip3 install hyperopt
+```
 ## To train/use a TB_IECS:
 ```
 Usage:
@@ -47,7 +56,7 @@ Arguments:
 
 Training Example:
 
-python3 tb_iecs.py --protein_file xx/1a30.pdb --label_csv xx/train_lig.csv --mode train --crystal_ligand_file xx/1a30.mol2 --dst_dir xx/result --model_file xx/tb_iec.pkl --ligand_path xx/ligands
+python3 tb_iecs.py --protein_file xx/1a30.pdb --label_csv xx/train_lig.csv --mode train --crystal_ligand_file xx/1a30.mol2 --dst_dir xx/result --model_file xx/tb_iec.pkl --ligand_path xx/training_ligands
 
 Result: xx/tb_iec.pkl, a model pkl that can be used for prediction
 
