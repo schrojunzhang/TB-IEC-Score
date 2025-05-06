@@ -2,10 +2,14 @@
 Main pipeline implementation for TB-IEC-Score
 """
 import os
+import sys
 import subprocess
 from multiprocessing import Pool
+from tqdm import tqdm
+from functools import partial
 from typing import Dict, List, Optional, Tuple, Union
-
+project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(project_dir)
 import numpy as np
 import pandas as pd
 from joblib import dump, load
@@ -24,9 +28,10 @@ class TBIECPipeline:
         protein_file: str,
         crystal_ligand_file: str,
         dst_dir: str,
-        smina_path: Optional[str] = None,
-        nnscore_path: Optional[str] = None,
-        mgltool_path: Optional[str] = None,
+        num_workers: int = 1,
+        smina_path: Optional[str] = f'{project_dir}/libs/Smina',
+        nnscore_path: Optional[str] = f'{project_dir}/libs/NNscore',
+        mgltool_path: Optional[str] = f'{project_dir}/libs/mgltools_x86_64Linux2_1.5.7',
     ):
         """
         Initialize TB-IEC-Score pipeline.
@@ -42,14 +47,14 @@ class TBIECPipeline:
         self.protein_file = protein_file
         self.crystal_ligand_file = crystal_ligand_file
         self.dst_dir = dst_dir
-        
+        self.num_workers = num_workers
         # Create destination directory if it doesn't exist
         os.makedirs(dst_dir, exist_ok=True)
         
         # Get paths from environment if not provided
-        self.smina_path = smina_path or os.environ.get('SMINA')
-        self.nnscore_path = nnscore_path or os.environ.get('NNSCORE')
-        self.mgltool_path = mgltool_path or os.environ.get('MGLTOOL')
+        self.smina_path = smina_path
+        self.nnscore_path = nnscore_path
+        self.mgltool_path = mgltool_path
         
         # Check required paths
         if not self.smina_path:
@@ -57,8 +62,13 @@ class TBIECPipeline:
         if not self.nnscore_path:
             raise ValueError("NNSCORE path not provided or set in environment")
         if not self.mgltool_path:
-            raise ValueError("MGLTOOL path not provided or set in environment")
+            raise ValueError("MGLTOOL path not provided or set in environment, If you installed mgltools in other place, please set the path manually")
         
+        print(f'Using num_workers: {self.num_workers}')
+        print(f'Using smina_path: {self.smina_path}')
+        print(f'Using nnscore_path: {self.nnscore_path}')
+        print(f'Using mgltool_path: {self.mgltool_path}')
+
         # Prepare files
         self._prepare_files()
     
@@ -75,7 +85,9 @@ class TBIECPipeline:
         
         # Convert crystal ligand to PDBQT if needed
         if not os.path.exists(self.crystal_file):
-            cmd = (f'{self.mgltool_path}/bin/pythonsh '
+            crystal_file_dir = os.path.dirname(self.crystal_ligand_file)
+            cmd = f'cd {crystal_file_dir} && '
+            cmd += (f'{self.mgltool_path}/bin/pythonsh '
                  f'{self.mgltool_path}/MGLToolsPckgs/AutoDockTools/Utilities24/prepare_ligand4.py '
                  f'-l {self.crystal_ligand_file} -o {self.crystal_file} -A hydrogens')
             subprocess.run(cmd, shell=True, check=True)
@@ -128,19 +140,11 @@ class TBIECPipeline:
         ligands = os.listdir(ligand_path)
         
         # Calculate SMINA scores using multiprocessing
-        with Pool() as pool:
-            pool.map(
-                lambda ligand: process_ligand(
-                    ligand, 
-                    ligand_path=ligand_path,
-                    protein_pred=self.protein_pred,
-                    pdbqt_dir=self.pdbqt_dir,
-                    smina_path=self.smina_path,
-                    pocket_center=self.pocket_center,
-                    smina_csv=self.smina_csv
-                ), 
-                ligands
-            )
+        process_ligand_ = partial(process_ligand, ligand_path=ligand_path, protein_pred=self.protein_pred, pdbqt_dir=self.pdbqt_dir, smina_path=self.smina_path, mgl_tool_path=self.mgltool_path, pocket_center=self.pocket_center, smina_csv=self.smina_csv)
+        pool = Pool(self.num_workers)
+        list(tqdm(pool.imap(process_ligand_, ligands), total=len(ligands)))
+        pool.close()
+        pool.join()
         
         # Calculate NNScore descriptors
         cmd = f'python2 {os.path.join(os.path.dirname(__file__), "../../descriptors/nnscore.py")} {self.dst_dir} {ligand_path} {self.dst_dir}'

@@ -52,24 +52,17 @@ pip install -r requirements.txt
 ```
 cd $HOME/TB-IEC-Score/libs/Smina
 chmod +x ./smina
-export SMINA=$HOME/TB-IEC-Score/libs/Smina
-```
-
-### Install nnscore 2.0
-```
-# Set environment variable: 
-export NNSCORE=$HOME/TB-IEC-Score/libs/NNscore
 ```
 
 ### Install mgltool
 ```
-cd $HOME
+cd $HOME/libs
 download mgltool: https://ccsb.scripps.edu/mgltools/download/491/
 tar -zxvf mgltools_x86_64Linux2_1.5.7p1.tar.gz
+rm mgltools_x86_64Linux2_1.5.7p1.tar.gz
 cd mgltools_x86_64Linux2_1.5.7/
 chmod +x install.sh
 ./install.sh
-export MGLTOOL=/opt/mgltools/1.5.7
 ```
 
 

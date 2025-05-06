@@ -4,6 +4,10 @@ Example script for training a TB-IEC-Score model
 """
 import argparse
 import os
+import sys
+
+project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_dir)
 
 from tb_iecs.core.pipeline import TBIECPipeline
 
@@ -12,24 +16,32 @@ def parse_args():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(description="Train a TB-IEC-Score model")
     
-    parser.add_argument("--protein_file", type=str, required=True,
+    parser.add_argument("--protein_file", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'wee1_p.pdb'),
                         help="Path to protein PDB file")
-    parser.add_argument("--crystal_ligand_file", type=str, required=True,
+    parser.add_argument("--crystal_ligand_file", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'wee1_l.mol2'),
                         help="Path to crystal ligand MOL2 file")
-    parser.add_argument("--ligand_path", type=str, required=True,
+    parser.add_argument("--ligand_path", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'train_ligands'),
                         help="Path to directory containing ligand SDF files")
-    parser.add_argument("--label_csv", type=str, required=True,
+    parser.add_argument("--label_csv", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'wee1_label.csv'),
                         help="Path to CSV file with ligand labels (name, label)")
-    parser.add_argument("--dst_dir", type=str, default="./results",
+    parser.add_argument("--dst_dir", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'results'),
                         help="Directory for results (default: ./results)")
-    parser.add_argument("--model_file", type=str, default="./tb_iecs_model.pkl",
+    parser.add_argument("--model_file", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'results', 'tb_iecs_model.pkl'),
                         help="Path to save model (default: ./tb_iecs_model.pkl)")
     parser.add_argument("--model_type", type=str, default="xgboost",
                         choices=["xgboost", "svm", "rf"],
                         help="Model type to use (default: xgboost)")
-    parser.add_argument("--no_hyper_opt", action="store_true",
+    parser.add_argument("--no_hyper_opt", action="store_true", 
+                        default=False,
                         help="Disable hyperparameter optimization")
-    
+    parser.add_argument("--num_workers", type=int, default=30,
+                        help="Number of workers for parallel processing (default: 1)")
     return parser.parse_args()
 
 
@@ -48,12 +60,14 @@ def main():
     print(f"Label CSV: {args.label_csv}")
     print(f"Model type: {args.model_type}")
     print(f"Hyperparameter optimization: {not args.no_hyper_opt}")
+    print(f"Number of workers: {args.num_workers}")
     print("-" * 50)
     
     # Initialize pipeline
     pipeline = TBIECPipeline(
         protein_file=args.protein_file,
         crystal_ligand_file=args.crystal_ligand_file,
+        num_workers=args.num_workers,
         dst_dir=args.dst_dir
     )
     
