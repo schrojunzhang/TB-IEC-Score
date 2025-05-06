@@ -1,0 +1,146 @@
+ZINC41062467_1744
+                    3D
+ Schrodinger Suite 2024-2.
+ 24 25  0  0  1  0            999 V2000
+    1.0931   49.8837   23.0044 C   0  0  0  0  0  0
+    0.3574   49.9135   24.3251 C   0  0  0  0  0  0
+   -0.0101   51.0546   24.8945 N   0  0  0  0  0  0
+   -0.8507   48.7227   26.8484 H   0  0  0  0  0  0
+   -0.5468   50.6588   26.0225 C   0  0  0  0  0  0
+   -0.4956   49.2970   26.0817 N   0  0  0  0  0  0
+    0.0876   48.8092   24.9888 N   0  0  0  0  0  0
+   -1.2364   51.6967   27.2678 S   0  0  0  0  0  0
+    0.2135   52.1413   28.2036 C   0  0  0  0  0  0
+    1.3620   52.5647   27.5253 C   0  0  0  0  0  0
+    2.5002   52.9429   28.2302 C   0  0  0  0  0  0
+    2.4943   52.9165   29.6211 C   0  0  0  0  0  0
+    1.3537   52.5127   30.3128 C   0  0  0  0  0  0
+    0.2130   52.1189   29.6126 C   0  0  0  0  0  0
+   -0.8956   51.6967   30.3476 N   0  0  0  0  0  0
+    3.9044   53.3891   30.4817 Cl  0  0  0  0  0  0
+    1.6105   48.9414   22.8188 H   0  0  0  0  0  0
+    1.8790   50.6396   23.0013 H   0  0  0  0  0  0
+    0.4519   50.1462   22.1632 H   0  0  0  0  0  0
+    1.3812   52.6141   26.4477 H   0  0  0  0  0  0
+    3.3837   53.2598   27.6950 H   0  0  0  0  0  0
+    1.3573   52.4967   31.3937 H   0  0  0  0  0  0
+   -0.8956   51.6967   31.3710 H   0  0  0  0  0  0
+   -1.5813   51.1256   29.8694 H   0  0  0  0  0  0
+  1 17  1  0  0  0
+  1 18  1  0  0  0
+  1 19  1  0  0  0
+  1  2  1  0  0  0
+  2  3  1  0  0  0
+  2  7  2  0  0  0
+  3  5  2  0  0  0
+  4  6  1  0  0  0
+  5  8  1  0  0  0
+  5  6  1  0  0  0
+  6  7  1  0  0  0
+  8  9  1  0  0  0
+  9 14  2  0  0  0
+  9 10  1  0  0  0
+ 10 11  2  0  0  0
+ 10 20  1  0  0  0
+ 11 12  1  0  0  0
+ 11 21  1  0  0  0
+ 12 13  2  0  0  0
+ 12 16  1  0  0  0
+ 13 14  1  0  0  0
+ 13 22  1  0  0  0
+ 14 15  1  0  0  0
+ 15 23  1  0  0  0
+ 15 24  1  0  0  0
+M  END
+> <i_i_glide_confnum>
+2
+
+> <i_i_glide_lignum>
+1745
+
+> <i_i_glide_posenum>
+323
+
+> <i_i_glide_rotatable_bonds>
+2
+
+> <i_m_Source_File_Index>
+1002
+
+> <b_m_subgroup_collapsed>
+0
+
+> <r_i_docking_score>
+-4.73939
+
+> <r_i_glide_ecoul>
+-8.70263
+
+> <r_i_glide_eff_state_penalty>
+0
+
+> <r_i_glide_einternal>
+0.882648
+
+> <r_i_glide_emodel>
+-39.9317
+
+> <r_i_glide_energy>
+-30.1145
+
+> <r_i_glide_erotb>
+0.597458
+
+> <r_i_glide_esite>
+-0.234024
+
+> <r_i_glide_evdw>
+-21.4119
+
+> <r_i_glide_gscore>
+-4.73939
+
+> <r_i_glide_hbond>
+-0.304
+
+> <r_i_glide_ligand_efficiency>
+-0.315959
+
+> <r_i_glide_ligand_efficiency_ln>
+-1.27813
+
+> <r_i_glide_ligand_efficiency_sa>
+-0.779222
+
+> <r_i_glide_lipo>
+-0.635372
+
+> <r_i_glide_metal>
+0
+
+> <r_i_glide_rewards>
+-1.78746
+
+> <s_i_glide_gridfile>
+wee1_glide-grid
+
+> <s_m_Source_File>
+wee1_decoys_glide_SP.sdf
+
+> <s_m_Source_Path>
+/Users/zhangxujun/Desktop
+
+> <s_m_entry_id>
+1277
+
+> <s_m_entry_name>
+wee1_decoys_glide_SP.1002
+
+> <s_m_subgroup_title>
+wee1_decoys_glide_SP
+
+> <s_m_subgroupid>
+wee1_decoys_glide_SP
+
+
+$$$$
