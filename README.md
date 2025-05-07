@@ -81,35 +81,8 @@ TB-IEC-Score/
 
 ## Quick Start
 
-### Command Line Interface
 
-#### Training Mode
-
-```bash
-python -m tb_iecs train --protein_file path/to/protein.pdb \
-                       --ligand_path path/to/ligands \
-                       --label_csv path/to/labels.csv \
-                       --crystal_ligand_file path/to/crystal.mol2 \
-                       --model_file path/to/model.pkl \
-                       --dst_dir path/to/results \
-                       --model_type xgboost \
-                       --num_workers 4
-```
-
-#### Prediction Mode
-
-```bash
-python -m tb_iecs predict --protein_file path/to/protein.pdb \
-                        --ligand_path path/to/ligands \
-                        --crystal_ligand_file path/to/crystal.mol2 \
-                        --model_file path/to/model.pkl \
-                        --dst_dir path/to/results \
-                        --num_workers 4
-```
-
-### Python API
-
-#### Training Example
+### Training Example
 
 ```python
 from tb_iecs.core.pipeline import TBIECPipeline
@@ -136,7 +109,7 @@ for key, value in metrics.items():
     print(f"{key}: {value:.4f}")
 ```
 
-#### Prediction Example
+### Prediction Example
 
 ```python
 from tb_iecs.core.pipeline import TBIECPipeline
