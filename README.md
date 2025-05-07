@@ -33,6 +33,7 @@ cd TB-IEC-Score
 ```bash
 pip install -r requirements.txt
 ```
+or using the provided conda env (https://zenodo.org/records/15354377)
 
 ### Step 3: Install External Tools
 
