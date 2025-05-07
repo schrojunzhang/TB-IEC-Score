@@ -29,10 +29,10 @@ def parse_args():
                         default=os.path.join(project_dir, 'examples', 'wee1', 'wee1_label.csv'),
                         help="Path to CSV file with ligand labels (name, label)")
     parser.add_argument("--dst_dir", type=str, 
-                        default=os.path.join(project_dir, 'examples', 'wee1', 'results'),
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'training_results'),
                         help="Directory for results (default: ./results)")
     parser.add_argument("--model_file", type=str, 
-                        default=os.path.join(project_dir, 'examples', 'wee1', 'results', 'tb_iecs_model.pkl'),
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'training_results', 'tb_iecs_model.pkl'),
                         help="Path to save model (default: ./tb_iecs_model.pkl)")
     parser.add_argument("--model_type", type=str, default="xgboost",
                         choices=["xgboost", "svm", "rf"],
@@ -40,7 +40,7 @@ def parse_args():
     parser.add_argument("--no_hyper_opt", action="store_true", 
                         default=False,
                         help="Disable hyperparameter optimization")
-    parser.add_argument("--num_workers", type=int, default=30,
+    parser.add_argument("--num_workers", type=int, default=120,
                         help="Number of workers for parallel processing (default: 1)")
     return parser.parse_args()
 

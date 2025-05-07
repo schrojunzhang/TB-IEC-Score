@@ -2,19 +2,27 @@
 Main pipeline implementation for TB-IEC-Score
 """
 import os
-import sys
 import subprocess
-from multiprocessing import Pool
-from tqdm import tqdm
+import sys
 from functools import partial
+from multiprocessing import Pool
 from typing import Dict, List, Optional, Tuple, Union
+
+from tqdm import tqdm
+
 project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(project_dir)
 import numpy as np
 import pandas as pd
 from joblib import dump, load
 from tb_iecs.core.model import XGBoostModel, get_model
-from tb_iecs.descriptors.smina import process_ligand, smina_header
+from tb_iecs.descriptors.nnscore import calc_nnscore, nnscore_header
+from tb_iecs.descriptors.smina import calc_smina_score, smina_header
+
+
+def smina_nnscore_descriptor(ligand, ligand_path, protein_pred, pdbqt_dir, smina_path, mgl_tool_path, pocket_center, smina_csv, nnscore_path, nnscore_csv):
+    calc_smina_score(ligand, ligand_path=ligand_path, protein_pred=protein_pred, pdbqt_dir=pdbqt_dir, smina_path=smina_path, mgl_tool_path=mgl_tool_path, pocket_center=pocket_center, smina_csv=smina_csv)
+    calc_nnscore(ligand, pdbqt_dir=pdbqt_dir, protein_pred=protein_pred, nnscore_path=nnscore_path, nnscore_csv=nnscore_csv)
 
 
 class TBIECPipeline:
@@ -124,7 +132,11 @@ class TBIECPipeline:
         self.smina_csv = os.path.join(self.dst_dir, 'smina.csv')
         pd.DataFrame(['name'] + smina_header).T.to_csv(
             self.smina_csv, index=None, header=None)
-        
+
+        self.nnscore_csv = os.path.join(self.dst_dir, 'nnscore.csv')
+        pd.DataFrame(['name'] + nnscore_header).T.to_csv(
+            self.nnscore_csv, index=None, header=None)
+
         # Create PDBQT directory for ligands
         self.pdbqt_dir = os.path.join(self.dst_dir, 'lig_pdbqt')
         os.makedirs(self.pdbqt_dir, exist_ok=True)
@@ -139,20 +151,29 @@ class TBIECPipeline:
         # Get all ligands
         ligands = os.listdir(ligand_path)
         
-        # Calculate SMINA scores using multiprocessing
-        process_ligand_ = partial(process_ligand, ligand_path=ligand_path, protein_pred=self.protein_pred, pdbqt_dir=self.pdbqt_dir, smina_path=self.smina_path, mgl_tool_path=self.mgltool_path, pocket_center=self.pocket_center, smina_csv=self.smina_csv)
+        # Prepare partial function for multiprocessing
+        smina_nnscore_descriptor_partial = partial(smina_nnscore_descriptor,
+                                                   ligand_path=ligand_path,
+                                                   protein_pred=self.protein_pred,
+                                                   pdbqt_dir=self.pdbqt_dir,
+                                                   smina_path=self.smina_path,
+                                                   mgl_tool_path=self.mgltool_path,
+                                                   pocket_center=self.pocket_center,
+                                                   smina_csv=self.smina_csv,
+                                                   nnscore_path=self.nnscore_path,
+                                                   nnscore_csv=self.nnscore_csv)
+
+        # Calculate SMINA scores and NNScore using multiprocessing
+        print(f'Generating descriptors...')
         pool = Pool(self.num_workers)
-        list(tqdm(pool.imap(process_ligand_, ligands), total=len(ligands)))
+        list(tqdm(pool.imap(smina_nnscore_descriptor_partial, ligands), total=len(ligands)))
         pool.close()
         pool.join()
         
-        # Calculate NNScore descriptors
-        cmd = f'python2 {os.path.join(os.path.dirname(__file__), "../../descriptors/nnscore.py")} {self.dst_dir} {ligand_path} {self.dst_dir}'
-        subprocess.run(cmd, shell=True, check=True)
-        
+
         # Merge descriptors
         df_smina = pd.read_csv(self.smina_csv)
-        df_nn = pd.read_csv(os.path.join(self.dst_dir, 'nnscore.csv'))
+        df_nn = pd.read_csv(self.nnscore_csv)
         df = pd.merge(df_smina, df_nn, on='name', how='inner')
         
         return df
@@ -200,7 +221,8 @@ class TBIECPipeline:
     def predict(
         self,
         ligand_path: str,
-        model_file: str
+        model_file: str,
+        output_csv: str,
     ) -> pd.DataFrame:
         """
         Make predictions with a trained TB-IEC-Score model.
@@ -236,6 +258,6 @@ class TBIECPipeline:
         df['pred_y_proba'] = pred_proba
         
         # Save results
-        df.to_csv(os.path.join(self.dst_dir, 'result.csv'), index=None)
+        df.to_csv(output_csv, index=None)
         
         return df 

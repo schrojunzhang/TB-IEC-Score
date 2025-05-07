@@ -4,30 +4,44 @@ Example script for using a trained TB-IEC-Score model for prediction
 """
 import argparse
 import os
+import sys
+
+project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_dir)
 
 import pandas as pd
 from tb_iecs.core.pipeline import TBIECPipeline
-
+from tb_iecs.core.model import ModelBase
 
 def parse_args():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(description="Use a trained TB-IEC-Score model for prediction")
     
-    parser.add_argument("--protein_file", type=str, required=True,
+    parser.add_argument("--protein_file", type=str,
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'wee1_p.pdb'),
                         help="Path to protein PDB file")
-    parser.add_argument("--crystal_ligand_file", type=str, required=True,
+    parser.add_argument("--crystal_ligand_file", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'wee1_l.mol2'),
                         help="Path to crystal ligand MOL2 file")
-    parser.add_argument("--ligand_path", type=str, required=True,
+    parser.add_argument("--ligand_path", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'test_ligands'),
                         help="Path to directory containing ligand SDF files")
-    parser.add_argument("--model_file", type=str, required=True,
+    parser.add_argument("--model_file", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'training_results', 'tb_iecs_model.pkl'),
                         help="Path to trained model file")
-    parser.add_argument("--dst_dir", type=str, default="./results",
+    parser.add_argument("--dst_dir", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'prediction_results'),
                         help="Directory for results (default: ./results)")
-    parser.add_argument("--output_csv", type=str, default=None,
+    parser.add_argument("--output_csv", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'prediction_results', 'result.csv'),
                         help="Path to save prediction results (default: dst_dir/result.csv)")
-    parser.add_argument("--print_top", type=int, default=10,
+    parser.add_argument("--print_top", type=int, default=100,
                         help="Number of top compounds to print (default: 10)")
-    
+    parser.add_argument("--num_workers", type=int, default=120,
+                    help="Number of workers for parallel processing (default: 1)")
+    parser.add_argument("--label_csv", type=str, 
+                        default=os.path.join(project_dir, 'examples', 'wee1', 'wee1_label.csv'),
+                        help="Path to CSV file with ligand labels (name, label)")
     return parser.parse_args()
 
 
@@ -54,6 +68,7 @@ def main():
     pipeline = TBIECPipeline(
         protein_file=args.protein_file,
         crystal_ligand_file=args.crystal_ligand_file,
+        num_workers=args.num_workers,
         dst_dir=args.dst_dir
     )
     
@@ -61,7 +76,8 @@ def main():
     print("Running prediction...")
     results = pipeline.predict(
         ligand_path=args.ligand_path,
-        model_file=args.model_file
+        model_file=args.model_file,
+        output_csv=output_csv
     )
     
     # Print summary
@@ -82,6 +98,16 @@ def main():
         print(f"{i:2d}. {row['name']:<20} - Score: {row['pred_y_proba']:.4f} - Prediction: {status}")
     
     print(f"\nResults saved to: {output_csv}")
+
+    # print metrics based on label_csv
+    if os.path.exists(args.label_csv):
+        label_df = pd.read_csv(args.label_csv)
+        results = pd.merge(results, label_df, on='name', how='left')
+        print(f"\nMetrics based on label_csv: {args.label_csv}")
+        print("-" * 50)
+        metrics = ModelBase().evaluate(results['label'], results['pred_y'], results['pred_y_proba'])
+        for key, value in metrics.items():
+            print(f"{key:20}: {value:.4f}")
 
 
 if __name__ == "__main__":

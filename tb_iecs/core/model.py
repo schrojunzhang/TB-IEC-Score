@@ -1,6 +1,11 @@
 """
 Machine learning models for TB-IEC-Score
 """
+# Disable GPU usage for XGBoost
+import os
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -202,7 +207,7 @@ class SVMModel(ModelBase):
             best = fmin(
                 optimize_model, hyper_parameter, 
                 algo=tpe.suggest, max_evals=100,
-                rstate=np.random.RandomState(42)
+                rstate=np.random.default_rng(42)
             )
             
             self.clf = svm.SVC(
@@ -295,7 +300,7 @@ class RandomForestModel(ModelBase):
             best = fmin(
                 optimize_model, hyper_parameter, 
                 algo=tpe.suggest, max_evals=100,
-                rstate=np.random.RandomState(42)
+                rstate=np.random.default_rng(42)
             )
             
             self.clf = RandomForestClassifier(
@@ -365,7 +370,7 @@ class XGBoostModel(ModelBase):
         # Optimize hyperparameters
         if self.hyper_opt:
             def optimize_model(hyper_parameter):
-                clf = XGBClassifier(**hyper_parameter, n_jobs=-1, random_state=42)
+                clf = XGBClassifier(**hyper_parameter, n_jobs=-1, random_state=42, device="cpu")
                 score = cross_val_score(
                     clf, train_x, train_y, 
                     cv=StratifiedKFold(n_splits=10, shuffle=True, random_state=42),
@@ -387,7 +392,7 @@ class XGBoostModel(ModelBase):
             best = fmin(
                 optimize_model, hyper_parameter, 
                 algo=tpe.suggest, max_evals=100,
-                rstate=np.random.RandomState(42)
+                rstate=np.random.default_rng(42)
             )
             
             self.clf = XGBClassifier(
@@ -395,10 +400,10 @@ class XGBoostModel(ModelBase):
                 max_depth=depths[best['max_depth']],
                 learning_rate=best['learning_rate'],
                 reg_lambda=best['reg_lambda'],
-                n_jobs=-1, random_state=42
+                n_jobs=-1, random_state=42, device="cpu"
             )
         else:
-            self.clf = XGBClassifier(n_jobs=-1, random_state=42)
+            self.clf = XGBClassifier(n_jobs=-1, random_state=42, device="cpu")
         
         # Train model
         self.clf.fit(train_x, train_y)

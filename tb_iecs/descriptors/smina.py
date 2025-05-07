@@ -38,7 +38,7 @@ smina_header = ['gauss(o=0,_w=0.3,_c=8)', 'gauss(o=0.5,_w=0.3,_c=8)', 'gauss(o=1
              'num_hydrophobic_atoms', 'ligand_length', 'num_ligands']
 
 
-def process_ligand(
+def calc_smina_score(
     ligand: str,
     ligand_path: str,
     protein_pred: str,
